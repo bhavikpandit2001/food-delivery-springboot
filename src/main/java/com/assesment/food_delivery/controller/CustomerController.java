@@ -39,7 +39,7 @@ public class CustomerController {
     private FeedbackService feedbackService;
 
     // menu items listing
-    @PostMapping("/listItems")
+    @PostMapping(value = "/listItems" ,consumes = MediaType.ALL_VALUE)
     public ResponseEntity<ApiResponseDto< List<Dish>>> listDishes(@ModelAttribute ListRequestDto request){
         try{
             List<Dish> dishes = menuService.listDishes(request);

@@ -1,9 +1,6 @@
 package com.assesment.food_delivery.controller;
 
-import com.assesment.food_delivery.config.Response;
 import com.assesment.food_delivery.dto.*;
-import com.assesment.food_delivery.entity.Feedback;
-import com.assesment.food_delivery.entity.Restaurant;
 import com.assesment.food_delivery.entity.User;
 import com.assesment.food_delivery.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;

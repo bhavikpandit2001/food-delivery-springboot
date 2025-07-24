@@ -5,6 +5,7 @@ import com.assesment.food_delivery.dto.ListRequestDto;
 import com.assesment.food_delivery.entity.Dish;
 import com.assesment.food_delivery.entity.Restaurant;
 import com.assesment.food_delivery.entity.Variant;
+import com.assesment.food_delivery.enums.OnboardingStatus;
 import com.assesment.food_delivery.repository.DishRepository;
 import com.assesment.food_delivery.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class MenuService {
             Restaurant restaurant = restaurantRepository.findById(request.getRestaurant_id())
                     .orElseThrow(() -> new RuntimeException("Restaurant not found..."));
 
+            if(restaurant.getStatus() == OnboardingStatus.PENDING ||  restaurant.getStatus() == OnboardingStatus.REJECTED){
+                throw new RuntimeException("please approve restaurant then add menu for this restaurant...");
+            }
             Dish dish = Dish.builder()
                     .dish_name(request.getDish_name())
                     .description(request.getDescription())

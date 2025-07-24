@@ -16,6 +16,7 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
     SELECT d FROM Dish d
     WHERE (:cuisine IS NULL OR LOWER(d.cuisine) LIKE LOWER(CONCAT('%', :cuisine, '%')))
     AND (:rating IS NULL OR d.rating >= :rating)
+    AND d.available = true
     """)
     List<Dish> listDishes(
             @Param("cuisine") String cuisine,
