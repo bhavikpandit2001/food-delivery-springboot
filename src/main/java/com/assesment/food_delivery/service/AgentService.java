@@ -2,6 +2,7 @@ package com.assesment.food_delivery.service;
 
 import com.assesment.food_delivery.entity.DeliveryAgent;
 import com.assesment.food_delivery.entity.Order;
+import com.assesment.food_delivery.enums.OrderStatus;
 import com.assesment.food_delivery.repository.DeliveryAgentRepository;
 import com.assesment.food_delivery.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class AgentService {
 
            //assign order to agent
            selectedAgent.setCurrentAssign(selectedAgent.getCurrentAssign());
+           selectedAgent.setAvailable(false);
            order.setAssigned_agent(selectedAgent);
 
            //save updates
@@ -48,7 +50,7 @@ public class AgentService {
        } catch (RuntimeException e){
            throw e; // Will be handled by global exception handler or controller
        } catch (Exception e) {
-           throw new RuntimeException("Failed to list dish due to unexpected error.");
+           throw new RuntimeException("Failed to assign delivery agent due to unexpected error.");
        }
     }
 
@@ -63,5 +65,21 @@ public class AgentService {
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
+    }
+
+    public void removeAssignment(Order order){
+        try{
+            DeliveryAgent agent = deliveryAgentRepository.findById(order.getAssigned_agent().getId()).orElseThrow(() -> new RuntimeException("agent not found..."));
+
+            if(order.getStatus() == OrderStatus.DELIVERED){
+                agent.setAvailable(true);
+                agent.setCurrentAssign(0);
+                deliveryAgentRepository.save(agent);
+            }
+        } catch (RuntimeException e){
+            throw e; // Will be handled by global exception handler or controller
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to free delivery agent due to unexpected error.");
+        }
     }
 }

@@ -167,6 +167,7 @@ public class OrderService {
                         type = NotificationTypes.DELIVERY_ARRIVED;
                         notificationService.sendNotification(order_id, message, type);
                     }
+                        assignmentService.removeAssignment(order);
                      break;
 
                 default:

@@ -33,18 +33,23 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String jwt = authHeader.substring(7);
-        String email = jwtUtil.ExtractUsername(jwt);
+        try{
+            String email = jwtUtil.ExtractUsername(jwt);
 
-        if(email != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            if(email != null && SecurityContextHolder.getContext().getAuthentication() == null){
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-            if(jwtUtil.ValidateToken(jwt, userDetails)){
-                UsernamePasswordAuthenticationToken authtoken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authtoken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authtoken);
-            }
-        };
+                if(jwtUtil.ValidateToken(jwt, userDetails)){
+                    UsernamePasswordAuthenticationToken authtoken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authtoken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authtoken);
+                }
+            };
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+        } catch (io.jsonwebtoken.JwtException e) {
+           response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+           response.getWriter().write("Unauthorized!!!");
+        }
     }
 }
