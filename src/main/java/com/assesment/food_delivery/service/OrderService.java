@@ -8,6 +8,7 @@ import com.assesment.food_delivery.enums.OrderStatus;
 import com.assesment.food_delivery.repository.DishRepository;
 import com.assesment.food_delivery.repository.OrderRepository;
 import com.assesment.food_delivery.repository.RestaurantRepository;
+import com.assesment.food_delivery.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,9 @@ import java.time.LocalDateTime;
 public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private DishRepository dishRepository;
@@ -41,6 +45,8 @@ public class OrderService {
     @Transactional
     public Order PlaceOrder(PlaceOrderRequestDto request){
         try{
+            User user =userRepository.findById(request.getUser_id()).orElseThrow(() -> new RuntimeException("user not found..."));
+
             restaurantRepository.findById(request.getRestaurant_id())
                     .orElseThrow(()-> new RuntimeException("Invalid restaurant id..."));
 
@@ -62,6 +68,7 @@ public class OrderService {
             }
 
             Order order = Order.builder()
+                    .user(user)
                     .address(request.getAddress())
                     .payment_type(request.getPaymentType())
                     .instruction(request.getInstructions())
@@ -143,14 +150,15 @@ public class OrderService {
             LocalDateTime now = LocalDateTime.now();
 
             long order_id = order.getId();
+            long user_id = order.getUser().getId();
             String message = "";
             NotificationTypes type = null;
 
             switch (newStatus){
                 case OrderStatus.CONFIRMED:
-                    message = "your order is confirmed...";
+                    message = "Confirmed and Cooking. Get your appetite ready!";
                     type = NotificationTypes.ORDER_CONFIRMED;
-                    notificationService.sendNotification(order_id, message, type);
+                    notificationService.sendNotification(order_id, message, type, user_id);
                 case OrderStatus.COOKING:
                     if(order.getCookingStartedAt() == null){
                         order.setCookingStartedAt(now);
@@ -159,6 +167,9 @@ public class OrderService {
                 case OrderStatus.OUT_FOR_DELIVERY:
                     if(order.getOutForDeliveryAt() == null){
                         order.setOutForDeliveryAt(now);
+                        message = "our riders out with your delicious mission...";
+                        type = NotificationTypes.OUT_FOR_DELIVERY;
+                        notificationService.sendNotification(order_id, message, type, user_id);
                     }
                     assignmentService.assignDeliveryAgent(order);
                     break;
@@ -166,9 +177,9 @@ public class OrderService {
                 case OrderStatus.DELIVERED:
                     if(order.getDeliveredAt() == null){
                         order.setDeliveredAt(now);
-                        message = "your order is delivered thank you for choosing us...";
+                        message = "Mission Delicious: Accomplished! thank you for choosing us...";
                         type = NotificationTypes.DELIVERY_ARRIVED;
-                        notificationService.sendNotification(order_id, message, type);
+                        notificationService.sendNotification(order_id, message, type, user_id);
                     }
                         assignmentService.removeAssignment(order);
                      break;

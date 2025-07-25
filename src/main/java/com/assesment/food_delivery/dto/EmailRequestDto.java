@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NotificationRequestDto {
+public class EmailRequestDto {
     private Long orderId;
     private NotificationTypes types;
     private String message;
+    private String email;
 }

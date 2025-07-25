@@ -1,5 +1,6 @@
 package com.assesment.food_delivery.dto;
 
+import com.assesment.food_delivery.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ public class PlaceOrderRequestDto {
     private String PaymentType;
     private String instructions;
     private Long restaurant_id;
+    private Long user_id;
     private double latitude;
     private double longitude;
 

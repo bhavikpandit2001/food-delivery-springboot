@@ -1,8 +1,11 @@
 package com.assesment.food_delivery.scheduler;
 
 import com.assesment.food_delivery.entity.Order;
+import com.assesment.food_delivery.entity.User;
 import com.assesment.food_delivery.enums.NotificationTypes;
+import com.assesment.food_delivery.enums.UserRole;
 import com.assesment.food_delivery.repository.OrderRepository;
+import com.assesment.food_delivery.repository.UserRepository;
 import com.assesment.food_delivery.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +19,9 @@ public class ScheduledService {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private NotificationService notificationService;
@@ -34,7 +40,10 @@ public class ScheduledService {
             for(Order order: cookingDelayed){
                 System.out.println(order.getId());
             }
-
+            User admin = userRepository.findByRole(UserRole.ADMIN)
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Admin not found"));
             //delivery delayed
             LocalDateTime deliveryThreshold = now.minusMinutes(40);
             List<Order> deliveryDelayed = orderRepository.findDeliveryDelayed(deliveryThreshold);
@@ -42,9 +51,11 @@ public class ScheduledService {
             for(Order order: deliveryDelayed){
                 System.out.println("delayed order id ==> " + order.getId());
                 long order_id = order.getId();
+                long user_id = order.getUser().getId();
                 String message = "your order is delayed please be patient we will reach to you asap...";
                 NotificationTypes type = NotificationTypes.DELIVERY_DELAYED;
-                notificationService.sendNotification(order_id, message, type);
+                notificationService.sendNotification(order_id, message, type, user_id);
+                notificationService.sendNotification(order_id, message, type, admin.getId());
             }
 
         } catch (RuntimeException e) {

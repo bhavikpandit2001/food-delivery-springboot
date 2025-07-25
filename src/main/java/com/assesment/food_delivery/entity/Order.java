@@ -69,4 +69,8 @@ public class Order {
 
     @ManyToOne
     private DeliveryAgent assigned_agent;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }
