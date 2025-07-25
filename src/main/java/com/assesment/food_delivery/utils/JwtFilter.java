@@ -49,7 +49,7 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (io.jsonwebtoken.JwtException e) {
            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-           response.getWriter().write("Unauthorized!!!");
+            response.getWriter().write("{\"error\": \"Unauthorized! You don't have access.\"}");
         }
     }
 }

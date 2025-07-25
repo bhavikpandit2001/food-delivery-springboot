@@ -36,7 +36,7 @@ public class AgentService {
                    )).orElseThrow(() -> new RuntimeException("no available agent..."));
 
            //assign order to agent
-           selectedAgent.setCurrentAssign(selectedAgent.getCurrentAssign());
+           selectedAgent.setCurrentAssign(selectedAgent.getCurrentAssign() + 1);
            selectedAgent.setAvailable(false);
            order.setAssigned_agent(selectedAgent);
 
