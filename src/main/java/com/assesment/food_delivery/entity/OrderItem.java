@@ -25,10 +25,10 @@ public class OrderItem {
     private String variant;
 
     @Column(nullable = false)
-    private double price;
+    private Double price;
 
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @ManyToOne
     @JsonBackReference

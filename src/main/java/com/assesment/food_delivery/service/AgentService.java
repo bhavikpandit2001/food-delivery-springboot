@@ -37,7 +37,7 @@ public class AgentService {
 
            //assign order to agent
            selectedAgent.setCurrentAssign(selectedAgent.getCurrentAssign() + 1);
-           selectedAgent.setAvailable(false);
+           selectedAgent.setIsAvailable(false);
            order.setAssigned_agent(selectedAgent);
 
            //save updates
@@ -72,7 +72,7 @@ public class AgentService {
             DeliveryAgent agent = deliveryAgentRepository.findById(order.getAssigned_agent().getId()).orElseThrow(() -> new RuntimeException("agent not found..."));
 
             if(order.getStatus() == OrderStatus.DELIVERED){
-                agent.setAvailable(true);
+                agent.setIsAvailable(true);
                 agent.setCurrentAssign(0);
                 deliveryAgentRepository.save(agent);
             }

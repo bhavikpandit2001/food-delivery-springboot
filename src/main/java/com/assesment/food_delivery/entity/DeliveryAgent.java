@@ -24,14 +24,14 @@ public class DeliveryAgent {
     private String email;
 
     @Column
-    private double latitude;
+    private Double latitude;
 
     @Column
-    private double longitude;
+    private Double longitude;
 
     @Column
-    private int currentAssign;
+    private Integer currentAssign;
 
     @Column
-    private boolean isAvailable;
+    private Boolean isAvailable;
 }

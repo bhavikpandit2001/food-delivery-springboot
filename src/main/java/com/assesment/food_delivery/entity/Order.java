@@ -62,10 +62,10 @@ public class Order {
     private LocalDateTime deliveredAt;
 
     @Column
-    private double delivery_lat;
+    private Double delivery_lat;
 
     @Column
-    private double delivery_lng;
+    private Double delivery_lng;
 
     @ManyToOne
     private DeliveryAgent assigned_agent;
