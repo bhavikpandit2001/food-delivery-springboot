@@ -20,10 +20,19 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> Login(@ModelAttribute AuthLoginRequestDto request) {
-        LoginResponse response = authService.login(request);
+    public ResponseEntity<ApiResponseDto<String>> Login(@ModelAttribute AuthLoginRequestDto request) {
+        String data = authService.login(request);
+        ApiResponseDto<String> response = new ApiResponseDto<>(HttpStatus.OK.value(),"otp sent successfully...", data);
         return ResponseEntity.ok(response);
     }
+
+
+    @PostMapping("/verify-with-otp")
+    public ResponseEntity<?> verifyOtp(@ModelAttribute OtpRequestDto reuest){
+        LoginResponse response = authService.verifyOtp(reuest);
+        return ResponseEntity.ok(response);
+    }
+
 
     // register user with role
     @PostMapping("/signup")

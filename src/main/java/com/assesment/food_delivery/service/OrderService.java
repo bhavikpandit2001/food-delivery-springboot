@@ -33,6 +33,9 @@ public class OrderService {
     private AgentService assignmentService;
 
     @Autowired
+    private WebhookService webhookService;
+
+    @Autowired
     private NotificationService notificationService;
 
     @Transactional
@@ -177,6 +180,9 @@ public class OrderService {
             //update order in db
             System.out.println(order.getDeliveredAt());
             orderRepository.save(order);
+
+            //webhook called
+            webhookService.sendOrderStatusWebhook(order);
         }catch (RuntimeException e){
             throw e;
         }catch (Exception e){

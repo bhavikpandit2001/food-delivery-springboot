@@ -3,6 +3,7 @@ package com.assesment.food_delivery.service;
 import com.assesment.food_delivery.dto.AuthLoginRequestDto;
 import com.assesment.food_delivery.dto.AuthRegisterRequestDto;
 import com.assesment.food_delivery.dto.LoginResponse;
+import com.assesment.food_delivery.dto.OtpRequestDto;
 import com.assesment.food_delivery.entity.User;
 import com.assesment.food_delivery.enums.UserRole;
 import com.assesment.food_delivery.repository.UserRepository;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class AuthService {
@@ -32,7 +34,7 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public LoginResponse login(AuthLoginRequestDto request) {
+    public String login(AuthLoginRequestDto request) {
         try {
             System.out.println("login api");
             System.out.println("user req ===> " + request);
@@ -57,8 +59,41 @@ public class AuthService {
                 throw new BadCredentialsException("Invalid role...");
             }
 
+            Random random = new Random();
+            int digits = 100000 + random.nextInt(900000); // ensures 6 digits (100000–999999)
+            String otp = String.valueOf(digits);
+            System.out.println("otp ==> "+ otp);
+            user.setOtp(otp);
+            userRepository.save(user);
+
+            return user.getOtp();
+
+        } catch (UsernameNotFoundException | BadCredentialsException ex) {
+            throw ex; // rethrow handled by exception handler or controller advice
+        } catch (Exception ex) {
+            throw new RuntimeException("Login failed due to unexpected error.");
+        }
+    }
+    public LoginResponse verifyOtp(OtpRequestDto request) {
+        try {
+            System.out.println("otp service api");
+            System.out.println("otp req ===> " + request);
+
+            User user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found..."));
+
+            System.out.println("user data ===> " + user);
+
+            String Otp = user.getOtp();
+
+            if (Otp == null || !Otp.equals(request.getOtp())) {
+                throw new RuntimeException("Invalid OTP or OTP has expired.");
+            }
+
             String access_token = JwtUtil.GenerateToken(user.getEmail(), user.getRole());
             System.out.println("token ==> " + access_token);
+
+            user.setOtp(null);
 
             return new LoginResponse(
                     "login successfully...",
@@ -67,8 +102,8 @@ public class AuthService {
                     user
             );
 
-        } catch (UsernameNotFoundException | BadCredentialsException ex) {
-            throw ex; // rethrow handled by exception handler or controller advice
+        } catch ( RuntimeException e) {
+            throw e; // rethrow handled by exception handler or controller advice
         } catch (Exception ex) {
             throw new RuntimeException("Login failed due to unexpected error.");
         }
